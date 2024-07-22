@@ -1,0 +1,90 @@
+#############################
+# Python Cheat Sheet for Data Analysts
+#############################
+
+### 1. Data Manipulation and Cleaning
+- Reading CSV:
+  import pandas as pd
+  df = pd.read_csv('data.csv')
+
+- Data Exploration:
+  df.head()  # View first few rows
+  df.describe()  # Summary statistics
+  df.info()  # Data types and missing values
+
+- Handling Missing Data:
+  df.dropna()  # Drop rows with missing values
+  df.fillna(value)  # Fill missing values with specified value
+
+### 2. Data Visualization
+- Matplotlib Basics:
+  import matplotlib.pyplot as plt
+  plt.plot(x, y)
+  plt.xlabel('X-axis label')
+  plt.ylabel('Y-axis label')
+  plt.title('Title')
+  plt.show()
+
+- Seaborn for Statistical Visualization:
+  import seaborn as sns
+  sns.histplot(data=df, x='column', bins=10, kde=True)
+
+### 3. Exploratory Data Analysis (EDA)
+- Correlation Analysis:
+  correlation_matrix = df.corr()
+  sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm')
+
+- Grouping and Aggregation:
+  df.groupby('column').agg({'numeric_column': ['mean', 'median']})
+
+### 4. Statistical Analysis
+- Hypothesis Testing (T-test):
+  from scipy.stats import ttest_ind
+  t_stat, p_value = ttest_ind(group1, group2)
+
+- Linear Regression:
+  from sklearn.linear_model import LinearRegression
+  model = LinearRegression()
+  model.fit(X, y)
+  predictions = model.predict(X)
+
+### 5. Data Wrangling
+- Merging DataFrames:
+  merged_df = pd.merge(df1, df2, on='key_column')
+
+- Reshaping Data:
+  df_pivot = df.pivot_table(index='index_column', columns='column_to_pivot', values='values')
+
+### 6. SQL Integration (with pandas)
+- Connecting to Database:
+  import pandas as pd
+  import sqlalchemy
+
+  engine = sqlalchemy.create_engine('database_connection_string')
+  df = pd.read_sql_query('SELECT * FROM table_name', engine)
+
+- Executing SQL Queries:
+  query = 'SELECT column1, AVG(column2) FROM table GROUP BY column1'
+  result = pd.read_sql_query(query, engine)
+
+### 7. Data Presentation and Reporting
+- Creating Reports (PDF):
+  from fpdf import FPDF
+
+  pdf = FPDF()
+  pdf.add_page()
+  pdf.set_font("Arial", size=12)
+  pdf.cell(200, 10, txt="Data Analysis Report", ln=True, align='C')
+  pdf.output("report.pdf")
+
+### Additional Resources
+- Pandas Documentation: https://pandas.pydata.org/pandas-docs/stable/
+- Matplotlib Documentation: https://matplotlib.org/stable/contents.html
+- Seaborn Documentation: https://seaborn.pydata.org/tutorial.html
+- SQLAlchemy Documentation: https://docs.sqlalchemy.org/en/14/
+
+### Tips and Best Practices
+- Document your analysis process and assumptions.
+- Validate data quality and integrity before analysis.
+- Collaborate with stakeholders to understand business requirements.
+

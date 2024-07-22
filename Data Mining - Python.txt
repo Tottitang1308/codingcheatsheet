@@ -1,0 +1,171 @@
+# Data Mining Cheat Sheet
+# -----------------------
+
+# Import Libraries
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score
+from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder, MinMaxScaler
+from sklearn.impute import SimpleImputer, KNNImputer
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, roc_curve, auc
+from sklearn.pipeline import Pipeline
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 1. Data Loading
+# ---------------
+# Load data from CSV
+data = pd.read_csv('data.csv')
+
+# Display first few rows
+print(data.head())
+
+# 2. Data Preprocessing
+# ---------------------
+# Handling Missing Values
+# Fill missing values with mean (numeric) or mode (categorical)
+numeric_imputer = SimpleImputer(strategy='mean')
+categorical_imputer = SimpleImputer(strategy='most_frequent')
+
+data['numeric_column'] = numeric_imputer.fit_transform(data[['numeric_column']])
+data['categorical_column'] = categorical_imputer.fit_transform(data[['categorical_column']])
+
+# Drop rows with missing values
+data = data.dropna()
+
+# Encoding Categorical Variables
+label_encoder = LabelEncoder()
+data['encoded_column'] = label_encoder.fit_transform(data['categorical_column'])
+
+# One-Hot Encoding
+one_hot_encoder = OneHotEncoder()
+encoded_columns = one_hot_encoder.fit_transform(data[['categorical_column']]).toarray()
+data = pd.concat([data, pd.DataFrame(encoded_columns)], axis=1)
+
+# Feature Scaling
+scaler = StandardScaler()
+data[['numeric_column1', 'numeric_column2']] = scaler.fit_transform(data[['numeric_column1', 'numeric_column2']])
+
+# Min-Max Scaling
+min_max_scaler = MinMaxScaler()
+data[['numeric_column1', 'numeric_column2']] = min_max_scaler.fit_transform(data[['numeric_column1', 'numeric_column2']])
+
+# Splitting the Dataset
+X = data.drop('target', axis=1)
+y = data['target']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 3. Data Exploration
+# -------------------
+# Summary Statistics
+print(data.describe())
+
+# Correlation Matrix
+corr_matrix = data.corr()
+sns.heatmap(corr_matrix, annot=True, cmap='coolwarm')
+plt.show()
+
+# Distribution Plots
+sns.histplot(data['numeric_column'], kde=True)
+plt.show()
+
+# Box Plots
+sns.boxplot(x='categorical_column', y='numeric_column', data=data)
+plt.show()
+
+# Pair Plot
+sns.pairplot(data)
+plt.show()
+
+# 4. Feature Engineering
+# ----------------------
+# Creating New Features
+data['feature_interaction'] = data['feature1'] * data['feature2']
+
+# Binning
+data['binned_feature'] = pd.cut(data['numeric_column'], bins=5, labels=False)
+
+# Log Transformation
+data['log_feature'] = np.log1p(data['numeric_column'])
+
+# Polynomial Features
+from sklearn.preprocessing import PolynomialFeatures
+poly = PolynomialFeatures(degree=2)
+poly_features = poly.fit_transform(data[['numeric_column1', 'numeric_column2']])
+data = pd.concat([data, pd.DataFrame(poly_features)], axis=1)
+
+# 5. Modeling
+# -----------
+# Creating Pipelines
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('classifier', RandomForestClassifier(n_estimators=100, random_state=42))
+])
+
+# Grid Search for Hyperparameter Tuning
+param_grid = {
+    'classifier__n_estimators': [50, 100, 200],
+    'classifier__max_depth': [None, 10, 20, 30]
+}
+
+grid_search = GridSearchCV(pipeline, param_grid, cv=5)
+grid_search.fit(X_train, y_train)
+
+# Best Model
+best_model = grid_search.best_estimator_
+
+# Predictions
+y_pred = best_model.predict(X_test)
+
+# Model Evaluation
+print(f'Accuracy: {accuracy_score(y_test, y_pred)}')
+print(classification_report(y_test, y_pred))
+
+# Confusion Matrix
+conf_matrix = confusion_matrix(y_test, y_pred)
+sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues')
+plt.show()
+
+# ROC Curve and AUC
+y_pred_proba = best_model.predict_proba(X_test)[:, 1]
+fpr, tpr, thresholds = roc_curve(y_test, y_pred_proba)
+roc_auc = auc(fpr, tpr)
+
+plt.figure()
+plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'ROC curve (area = {roc_auc:.2f})')
+plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic (ROC) Curve')
+plt.legend(loc='lower right')
+plt.show()
+
+# 6. Model Interpretation
+# -----------------------
+# Feature Importance
+importances = best_model.named_steps['classifier'].feature_importances_
+features = X.columns
+importance_df = pd.DataFrame({'Feature': features, 'Importance': importances}).sort_values(by='Importance', ascending=False)
+print(importance_df)
+
+# SHAP Values (for model explainability)
+import shap
+explainer = shap.TreeExplainer(best_model.named_steps['classifier'])
+shap_values = explainer.shap_values(X_test)
+shap.summary_plot(shap_values, X_test, plot_type="bar")
+
+# 7. Saving the Model
+# -------------------
+import joblib
+joblib.dump(best_model, 'best_model.pkl')
+
+# 8. Loading the Model
+# --------------------
+loaded_model = joblib.load('best_model.pkl')
+y_loaded_pred = loaded_model.predict(X_test)
+
+# Verify Loaded Model Performance
+print(f'Loaded Model Accuracy: {accuracy_score(y_test, y_loaded_pred)}')

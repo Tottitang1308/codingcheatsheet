@@ -1,0 +1,588 @@
+-- SQL Cheat Sheet
+
+-- 1. Basic Commands
+-- -----------------
+-- SELECT: Retrieve data from one or more tables
+SELECT column1, column2 FROM table_name;
+
+-- WHERE: Filter records
+SELECT column1, column2 FROM table_name WHERE condition;
+
+-- INSERT: Insert new data into a table
+INSERT INTO table_name (column1, column2) VALUES (value1, value2);
+
+-- UPDATE: Update existing data in a table
+UPDATE table_name SET column1 = value1, column2 = value2 WHERE condition;
+
+-- DELETE: Delete records from a table
+DELETE FROM table_name WHERE condition;
+
+-- 2. Table Operations
+-- -------------------
+-- CREATE TABLE: Define a new table
+CREATE TABLE table_name (
+  column1 datatype,
+  column2 datatype,
+  ...
+);
+
+-- ALTER TABLE: Modify an existing table
+ALTER TABLE table_name ADD column_name datatype;
+
+-- DROP TABLE: Delete a table
+DROP TABLE table_name;
+
+-- 3. Data Retrieval and Manipulation
+-- ----------------------------------
+-- JOIN: Combine rows from two or more tables
+SELECT a.column1, b.column2
+FROM table1 a
+JOIN table2 b ON a.common_column = b.common_column;
+
+-- UNION: Combine the result of two or more SELECT statements
+SELECT column1 FROM table1
+UNION
+SELECT column1 FROM table2;
+
+-- AGGREGATE FUNCTIONS: Perform calculations on multiple rows
+SELECT COUNT(column1), AVG(column2), SUM(column3)
+FROM table_name
+WHERE condition;
+
+-- GROUP BY: Group rows that have the same values
+SELECT column1, COUNT(*)
+FROM table_name
+GROUP BY column1;
+
+-- HAVING: Filter groups
+SELECT column1, COUNT(*)
+FROM table_name
+GROUP BY column1
+HAVING COUNT(*) > 1;
+
+-- ORDER BY: Sort the result set
+SELECT column1, column2
+FROM table_name
+ORDER BY column1 DESC;
+
+-- LIMIT: Specify the number of records to return
+SELECT column1, column2
+FROM table_name
+LIMIT 10;
+
+-- CASE: Create conditional logic
+SELECT column1,
+  CASE
+    WHEN condition1 THEN 'Result1'
+    WHEN condition2 THEN 'Result2'
+    ELSE 'Result3'
+  END AS new_column
+FROM table_name;
+
+-- 4. Indexes and Views
+-- --------------------
+-- CREATE INDEX: Create an index to speed up queries
+CREATE INDEX index_name ON table_name (column1, column2);
+
+-- CREATE VIEW: Create a virtual table based on a SELECT query
+CREATE VIEW view_name AS
+SELECT column1, column2
+FROM table_name
+WHERE condition;
+
+-- 5. Advanced Queries
+-- -------------------
+-- SUBQUERIES: Nested queries within a main query
+SELECT column1
+FROM table_name
+WHERE column2 = (SELECT column2 FROM another_table WHERE condition);
+
+-- COALESCE: Return the first non-null value
+SELECT column1, COALESCE(column2, 'Default Value')
+FROM table_name;
+
+-- WINDOW FUNCTIONS: Perform calculations across a set of table rows related to the current row
+SELECT column1,
+  ROW_NUMBER() OVER (PARTITION BY column2 ORDER BY column3) AS row_num
+FROM table_name;
+
+-- 6. Common Complicated Tasks
+-- ---------------------------
+-- Complex JOIN with multiple tables
+SELECT a.column1, b.column2, c.column3
+FROM table1 a
+JOIN table2 b ON a.common_column = b.common_column
+JOIN table3 c ON b.common_column = c.common_column
+WHERE a.condition = value;
+
+-- CTE (Common Table Expression): Simplify complex queries
+WITH cte_name AS (
+  SELECT column1, column2
+  FROM table_name
+  WHERE condition
+)
+SELECT column1
+FROM cte_name
+WHERE condition;
+
+-- Recursive CTE: Query hierarchical data
+WITH RECURSIVE cte_name AS (
+  SELECT column1, column2
+  FROM table_name
+  WHERE condition
+  UNION ALL
+  SELECT t.column1, t.column2
+  FROM table_name t
+  JOIN cte_name c ON t.parent_column = c.column1
+)
+SELECT column1
+FROM cte_name;
+
+-- Pivot Table: Transform rows into columns
+SELECT *
+FROM (
+  SELECT column1, column2, column3
+  FROM table_name
+) src
+PIVOT (
+  MAX(column3)
+  FOR column2 IN (value1, value2, value3)
+) pvt;
+
+-----------------------------------------------------------
+-- Calculation Scripts Cheat Sheet
+-- -------------------------------
+
+-- 1. Basic Arithmetic Operations
+-- ------------------------------
+-- Addition
+SELECT column1 + column2 AS sum_result
+FROM table_name;
+
+-- Subtraction
+SELECT column1 - column2 AS difference_result
+FROM table_name;
+
+-- Multiplication
+SELECT column1 * column2 AS product_result
+FROM table_name;
+
+-- Division
+SELECT column1 / column2 AS quotient_result
+FROM table_name;
+
+-- Modulus (Remainder)
+SELECT column1 % column2 AS remainder_result
+FROM table_name;
+
+-- 2. Aggregate Functions
+-- ----------------------
+-- Sum
+SELECT SUM(column_name) AS total_sum
+FROM table_name;
+
+-- Average
+SELECT AVG(column_name) AS average_value
+FROM table_name;
+
+-- Minimum
+SELECT MIN(column_name) AS minimum_value
+FROM table_name;
+
+-- Maximum
+SELECT MAX(column_name) AS maximum_value
+FROM table_name;
+
+-- Count
+SELECT COUNT(column_name) AS count_value
+FROM table_name;
+
+-- 3. Conditional Calculations
+-- ---------------------------
+-- CASE Statement
+SELECT column1,
+  CASE
+    WHEN condition1 THEN calculation1
+    WHEN condition2 THEN calculation2
+    ELSE default_calculation
+  END AS calculated_value
+FROM table_name;
+
+-- COALESCE (Return the first non-null value)
+SELECT COALESCE(column1, column2, default_value) AS result_value
+FROM table_name;
+
+-- 4. Date Calculations
+-- --------------------
+-- Current Date
+SELECT CURRENT_DATE AS today_date;
+
+-- Date Difference in Days
+SELECT DATEDIFF(end_date_column, start_date_column) AS date_diff_days
+FROM table_name;
+
+-- Add/Subtract Days to/from Date
+SELECT DATE_ADD(date_column, INTERVAL number_of_days DAY) AS new_date
+FROM table_name;
+
+SELECT DATE_SUB(date_column, INTERVAL number_of_days DAY) AS new_date
+FROM table_name;
+
+-- Extract Year, Month, Day from Date
+SELECT 
+  EXTRACT(YEAR FROM date_column) AS year_part,
+  EXTRACT(MONTH FROM date_column) AS month_part,
+  EXTRACT(DAY FROM date_column) AS day_part
+FROM table_name;
+
+-- 5. String Calculations
+-- ----------------------
+-- Concatenate Strings
+SELECT CONCAT(string_column1, string_column2) AS concatenated_string
+FROM table_name;
+
+-- Length of String
+SELECT LENGTH(string_column) AS string_length
+FROM table_name;
+
+-- Substring
+SELECT SUBSTRING(string_column, start_position, length) AS substring_value
+FROM table_name;
+
+-- Replace Substring
+SELECT REPLACE(string_column, 'old_substring', 'new_substring') AS replaced_string
+FROM table_name;
+
+-- 6. Mathematical Functions
+-- -------------------------
+-- Power
+SELECT POWER(column_name, exponent) AS power_result
+FROM table_name;
+
+-- Square Root
+SELECT SQRT(column_name) AS square_root_result
+FROM table_name;
+
+-- Round
+SELECT ROUND(column_name, decimal_places) AS rounded_result
+FROM table_name;
+
+-- Absolute Value
+SELECT ABS(column_name) AS absolute_value
+FROM table_name;
+
+-- 7. Advanced Calculations
+-- ------------------------
+-- Moving Average
+SELECT 
+  column_name,
+  AVG(column_name) OVER (ORDER BY date_column ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg
+FROM table_name;
+
+-- Cumulative Sum
+SELECT 
+  column_name,
+  SUM(column_name) OVER (ORDER BY date_column) AS cumulative_sum
+FROM table_name;
+
+-- Percentage of Total
+SELECT 
+  column_name,
+  column_name / SUM(column_name) OVER () * 100 AS percentage_of_total
+FROM table_name;
+
+-- 8. Example: Combining Multiple Calculations
+-- -------------------------------------------
+-- Calculate the total revenue, average revenue per transaction, and revenue growth rate
+WITH total_revenue AS (
+  SELECT 
+    SUM(amount) AS total
+  FROM transactions
+),
+avg_revenue AS (
+  SELECT 
+    AVG(amount) AS average
+  FROM transactions
+),
+revenue_growth AS (
+  SELECT 
+    (SUM(amount) - LAG(SUM(amount)) OVER (ORDER BY year)) / LAG(SUM(amount)) OVER (ORDER BY year) * 100 AS growth_rate
+  FROM transactions
+  GROUP BY year
+)
+SELECT 
+  tr.total AS total_revenue,
+  ar.average AS avg_revenue_per_transaction,
+  rg.growth_rate AS revenue_growth_rate
+FROM total_revenue tr, avg_revenue ar, revenue_growth rg;
+
+
+-----------------------------------------------------------------------
+-- EXAMPLE: Create and Query a Table
+-- ---------------------------------
+-- 1. Create a table for storing employee data:
+CREATE TABLE employees (
+  employee_id INT PRIMARY KEY,
+  first_name VARCHAR(50),
+  last_name VARCHAR(50),
+  department VARCHAR(50),
+  salary DECIMAL(10, 2),
+  hire_date DATE
+);
+
+-- 2. Insert sample data:
+INSERT INTO employees (employee_id, first_name, last_name, department, salary, hire_date)
+VALUES (1, 'John', 'Doe', 'HR', 60000, '2021-01-15'),
+       (2, 'Jane', 'Smith', 'IT', 75000, '2020-07-23');
+
+-- 3. Query the data:
+SELECT first_name, last_name, department, salary
+FROM employees
+WHERE salary > 65000
+ORDER BY salary DESC;
+
+
+-- EXAMPLE: Complex Join and Data Pulling
+-- -------------------------------------
+-- Scenario: We have three tables: orders, customers, and products.
+-- We need to pull detailed sales reports including customer names, product names, and the total amount spent by each customer.
+
+-- Table: customers
+-- Columns: customer_id, first_name, last_name, email
+
+-- Table: products
+-- Columns: product_id, product_name, price
+
+-- Table: orders
+-- Columns: order_id, customer_id, product_id, quantity, order_date
+
+-- Task: Generate a report with customer names, product names, and total amount spent by each customer, filtered by a specific date range.
+
+-- 1. Joining customers, products, and orders tables
+SELECT 
+  c.first_name,
+  c.last_name,
+  p.product_name,
+  o.quantity,
+  p.price,
+  (o.quantity * p.price) AS total_spent,
+  o.order_date
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+JOIN products p ON o.product_id = p.product_id
+WHERE o.order_date BETWEEN '2023-01-01' AND '2023-12-31';
+
+-- 2. Aggregating the total amount spent by each customer
+SELECT 
+  c.customer_id,
+  c.first_name,
+  c.last_name,
+  SUM(o.quantity * p.price) AS total_spent
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+JOIN products p ON o.product_id = p.product_id
+WHERE o.order_date BETWEEN '2023-01-01' AND '2023-12-31'
+GROUP BY c.customer_id, c.first_name, c.last_name
+ORDER BY total_spent DESC;
+
+-- 3. Including additional information like the most purchased product by each customer
+WITH customer_totals AS (
+  SELECT 
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    SUM(o.quantity * p.price) AS total_spent
+  FROM orders o
+  JOIN customers c ON o.customer_id = c.customer_id
+  JOIN products p ON o.product_id = p.product_id
+  WHERE o.order_date BETWEEN '2023-01-01' AND '2023-12-31'
+  GROUP BY c.customer_id, c.first_name, c.last_name
+),
+customer_favorite_product AS (
+  SELECT 
+    o.customer_id,
+    p.product_name,
+    SUM(o.quantity) AS total_quantity,
+    ROW_NUMBER() OVER (PARTITION BY o.customer_id ORDER BY SUM(o.quantity) DESC) AS rank
+  FROM orders o
+  JOIN products p ON o.product_id = p.product_id
+  WHERE o.order_date BETWEEN '2023-01-01' AND '2023-12-31'
+  GROUP BY o.customer_id, p.product_name
+)
+SELECT 
+  ct.customer_id,
+  ct.first_name,
+  ct.last_name,
+  ct.total_spent,
+  cfp.product_name AS favorite_product,
+  cfp.total_quantity
+FROM customer_totals ct
+JOIN customer_favorite_product cfp ON ct.customer_id = cfp.customer_id
+WHERE cfp.rank = 1
+ORDER BY ct.total_spent DESC;
+
+-- 4. Handling NULL values and ensuring data quality
+SELECT 
+  c.first_name,
+  c.last_name,
+  COALESCE(p.product_name, 'Unknown') AS product_name,
+  COALESCE(o.quantity, 0) AS quantity,
+  COALESCE(p.price, 0) AS price,
+  COALESCE((o.quantity * p.price), 0) AS total_spent,
+  COALESCE(o.order_date, '1900-01-01') AS order_date
+FROM orders o
+LEFT JOIN customers c ON o.customer_id = c.customer_id
+LEFT JOIN products p ON o.product_id = p.product_id
+WHERE o.order_date BETWEEN '2023-01-01' AND '2023-12-31';
+
+
+-- Feature Engineering Example
+-- ---------------------------------
+-- Scenario: We have a transactional database with customer transactions. We want to engineer new features for a customer segmentation model.
+
+-- Table: transactions
+-- Columns: transaction_id, customer_id, transaction_date, amount, product_id
+
+-- Table: customers
+-- Columns: customer_id, first_name, last_name, date_of_birth, sign_up_date
+
+-- 1. Calculate Customer Age
+SELECT 
+  customer_id,
+  first_name,
+  last_name,
+  FLOOR(DATEDIFF(CURRENT_DATE, date_of_birth) / 365.25) AS age
+FROM customers;
+
+-- 2. Calculate Recency, Frequency, and Monetary Value (RFM) for Each Customer
+-- Recency: Days since last purchase
+-- Frequency: Number of transactions
+-- Monetary: Total amount spent
+
+-- a. Calculate Recency
+SELECT 
+  customer_id,
+  DATEDIFF(CURRENT_DATE, MAX(transaction_date)) AS recency
+FROM transactions
+GROUP BY customer_id;
+
+-- b. Calculate Frequency
+SELECT 
+  customer_id,
+  COUNT(transaction_id) AS frequency
+FROM transactions
+GROUP BY customer_id;
+
+-- c. Calculate Monetary Value
+SELECT 
+  customer_id,
+  SUM(amount) AS monetary
+FROM transactions
+GROUP BY customer_id;
+
+-- 3. Combine RFM Features
+WITH recency AS (
+  SELECT 
+    customer_id,
+    DATEDIFF(CURRENT_DATE, MAX(transaction_date)) AS recency
+  FROM transactions
+  GROUP BY customer_id
+),
+frequency AS (
+  SELECT 
+    customer_id,
+    COUNT(transaction_id) AS frequency
+  FROM transactions
+  GROUP BY customer_id
+),
+monetary AS (
+  SELECT 
+    customer_id,
+    SUM(amount) AS monetary
+  FROM transactions
+  GROUP BY customer_id
+)
+SELECT 
+  c.customer_id,
+  c.first_name,
+  c.last_name,
+  r.recency,
+  f.frequency,
+  m.monetary
+FROM customers c
+LEFT JOIN recency r ON c.customer_id = r.customer_id
+LEFT JOIN frequency f ON c.customer_id = f.customer_id
+LEFT JOIN monetary m ON c.customer_id = m.customer_id;
+
+-- 4. Calculate Average Transaction Value
+SELECT 
+  customer_id,
+  AVG(amount) AS avg_transaction_value
+FROM transactions
+GROUP BY customer_id;
+
+-- 5. Calculate Transaction Count per Month
+SELECT 
+  customer_id,
+  YEAR(transaction_date) AS year,
+  MONTH(transaction_date) AS month,
+  COUNT(transaction_id) AS transaction_count
+FROM transactions
+GROUP BY customer_id, YEAR(transaction_date), MONTH(transaction_date);
+
+-- 6. Combine All Features into a Single Table
+WITH customer_age AS (
+  SELECT 
+    customer_id,
+    FLOOR(DATEDIFF(CURRENT_DATE, date_of_birth) / 365.25) AS age
+  FROM customers
+),
+rfm AS (
+  SELECT 
+    c.customer_id,
+    r.recency,
+    f.frequency,
+    m.monetary
+  FROM customers c
+  LEFT JOIN (
+    SELECT 
+      customer_id,
+      DATEDIFF(CURRENT_DATE, MAX(transaction_date)) AS recency
+    FROM transactions
+    GROUP BY customer_id
+  ) r ON c.customer_id = r.customer_id
+  LEFT JOIN (
+    SELECT 
+      customer_id,
+      COUNT(transaction_id) AS frequency
+    FROM transactions
+    GROUP BY customer_id
+  ) f ON c.customer_id = f.customer_id
+  LEFT JOIN (
+    SELECT 
+      customer_id,
+      SUM(amount) AS monetary
+    FROM transactions
+    GROUP BY customer_id
+  ) m ON c.customer_id = m.customer_id
+),
+avg_transaction AS (
+  SELECT 
+    customer_id,
+    AVG(amount) AS avg_transaction_value
+  FROM transactions
+  GROUP BY customer_id
+)
+SELECT 
+  c.customer_id,
+  c.first_name,
+  c.last_name,
+  ca.age,
+  rfm.recency,
+  rfm.frequency,
+  rfm.monetary,
+  avg_transaction.avg_transaction_value
+FROM customers c
+LEFT JOIN customer_age ca ON c.customer_id = ca.customer_id
+LEFT JOIN rfm ON c.customer_id = rfm.customer_id
+LEFT JOIN avg_transaction ON c.customer_id = avg_transaction.customer_id;
